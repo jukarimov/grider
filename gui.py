@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-import sys
+from curses import initscr, newwin, endwin
+import time, sys
 from grider import foo
 
 L='L'
@@ -17,11 +18,10 @@ bar = foo(sys.argv[1])
 def step():
 
 	if bar.gridsolved():
-		print "SOLVED!"
-		return True
+		#print "SOLVED!"
+		return 0
 	elif bar.nosolution:
-		print 'NO SOLUTION!!!'
-		return True
+		return -1
 
 	if bar.dir == R and bar.isopen(D):
 		bar.lookDown()
@@ -119,27 +119,57 @@ def step():
 					bar.forward()
 					break
 		elif bar.inBadpath(U):
-			print 'Bad path'
+			#print 'Bad path'
 			bar.lookLeft()
 			bar.forward()
 
 	if bar.pos() == bar.path[0]:
 		#bar.exit('No solution')
-		print 'Dead end here'
+		#print 'Dead end here'
 		bar.entry_at += 1
-		bar.placeai(bar.entry_at)
+		return bar.placeai(bar.entry_at)
 
-	return False
+	return 1
 
-while not step():
+#################################################
+#	C U R S E S	G U I - Z A T I O N	#
+#################################################
 
-	for i in range(bar.gridW + 5): print '-',
-	print
+initscr();
 
-	buf = bar.show()
-	for i in buf:
-		for j in i:
-			print j,
-		print
+win = newwin(30,60,0,0);
+win.nodelay(1);
+n = 0
 
+while 1:
+
+	# press q for exit
+	if win.getch() == ord('q'):
+		break
+
+	win.addstr(0, 1, "step: " + str(n))
+
+	grid = bar.show()
+
+	for i in range(bar.gridH):
+		for j in range(bar.gridW):
+			win.addstr(i+5, j+10, grid[i][j])
+
+	win.refresh()
+
+	r = step()
+	if r == 0:
+		win.addstr(25, 1, "Solved")
+		break
+	elif r == -1 or bar.nosolution:
+		win.addstr(25, 1, "No solution")
+		break
+	else:
+		n += 1
+
+	time.sleep(0.5)
+
+win.refresh()
+time.sleep(3)
+endwin()
 

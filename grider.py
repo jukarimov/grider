@@ -18,8 +18,6 @@ class foo:
 		self.col	= -1
 		self.entry_at	= 0
 
-		self.placeai(self.entry_at)
-
 		self.dirs	= 'LDRU'
 		self.curs	= '<v>^'
 
@@ -27,7 +25,9 @@ class foo:
 		self.cur	= '>'
 
 		self.read()
-		self.placeai(self.entry_at)
+		self.nosolution = False
+		if self.placeai(self.entry_at) != True:
+			self.nosolution = True
 
 	def read(self):
 		self.grid = file(self.fname).read().split('\n')
@@ -44,8 +44,10 @@ class foo:
 			if self.grid[0][i] != '#':
 				self.setPos(0, i)
 				return True
-		if not self.gameover():
-			self.exit('!!!NO solution!!!')
+		if not self.gridsolved():
+			#self.exit('!!!NO solution!!!')
+			self.nosolution = True
+			return -1
 
 	def setPos(self, row, col):
 
@@ -105,18 +107,20 @@ class foo:
 		return [row, col]
 
 	def show(self):
-
+		scr = []
 		for i in range(self.gridH):
+			row = []
 			for j in range(self.gridW):
 				if [i, j] == self.pos():
-					print self.cur,
+					row.append(self.cur)
 
 				elif [i, j] in self.path:
-					print '.',
+					row.append('.')
 
 				else:
-					print self.grid[i][j],
-			print
+					row.append(self.grid[i][j])
+			scr.append(row)
+		return scr
 
 	def setDir(self, n):
 		self.dir = self.dirs[n]
@@ -152,7 +156,7 @@ class foo:
 			self.self.exit('Wrong dir')
 
 
-	def gameover(self):
+	def gridsolved(self):
 		return self.row == self.gridH - 1
 
 	def turn(self):
