@@ -35,6 +35,9 @@ class foo:
 		self.gridH = len(self.grid)
 		self.gridW = len(self.grid[0])
 
+		for row in self.grid:
+			assert(len(row) == self.gridW)
+
 	def exit(self, msg):
 		print msg
 		exit(-1)
@@ -43,6 +46,7 @@ class foo:
 		for i in range(pos, self.gridW):
 			if self.grid[0][i] != '#':
 				self.setPos(0, i)
+				self.entry_at = i
 				return True
 		if not self.gridsolved():
 			#self.exit('!!!NO solution!!!')

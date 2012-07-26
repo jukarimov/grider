@@ -14,124 +14,73 @@ if len(sys.argv) != 2:
 
 bar = foo(sys.argv[1])
 
+
 def step():
 
 	if bar.gridsolved():
-		print "SOLVED!"
-		return True
-	elif bar.nosolution:
-		print 'NO SOLUTION!!!'
-		return True
+		return 0
 
-	if bar.dir == R and bar.isopen(D):
-		bar.lookDown()
+	if bar.nosolution:
+		return -1
 
-	elif bar.dir == D and bar.isopen(L):
-		bar.lookLeft()
+	if bar.dir == D and bar.isopen(L):
+		bar.lookTo(L)
+		bar.forward()
 
 	elif bar.dir == L and bar.isopen(U):
-		bar.lookUp()
+		bar.lookTo(U)
+		bar.forward()
+
+	elif bar.dir == R and bar.isopen(D):
+		bar.lookTo(D)
+		bar.forward()
 
 	elif bar.dir == U and bar.isopen(R):
-		bar.lookRight()
+		bar.lookTo(R)
+		bar.forward()
 
-#	elif bar.dir == U and bar.isopen(L) and not bar.coordOf(L) in bar.path:
-#		bar.lookLeft()
+	elif bar.dir == U and not bar.isopen(U) and bar.isopen(L):
+		bar.lookTo(L)
+		bar.forward()
 
-#	elif bar.coordOf(L) in bar.path:
-#		print 'Left in badpath'
+	elif not bar.forward():
 
-	if not bar.forward():
-
-		bar.blistit(bar.pos())
 		W = bar.wallfrom()
 
-		if L in W and R in W and U in W:
-			bar.lookDown()
-
-		elif L in W and not R in W:
-			bar.lookRight()
-
-		elif L in W and not R in W and not U in W:
-			bar.lookUp()
-			W = bar.wallfrom()
-			while L in W and bar.forward():
-				W = bar.wallfrom()
-				if bar.isopen(L):
-					bar.lookLeft()
-					bar.forward()
-					break
-				else:
-					bar.lookDown()
-					bar.forward()
-					break
-
-		elif R in W and not U in W and not D in W:
-			while bar.forward():
-				W = bar.wallfrom()
-				if bar.isopen(R):
-					bar.lookRight()
-					bar.forward()
-					break
-			W = bar.wallfrom()
-			if U in W and R in W and not L in W:
-				bar.lookLeft()
-				bar.forward()
-
-		elif R in W and U in W and D in W:
-			bar.lookLeft()
-			W = bar.wallfrom()
-			while U in W and bar.forward():
-				W = bar.wallfrom()
-				if bar.isopen(U):
-					bar.lookUp()
-					bar.forward()
-					break
-
-		elif R in W and U in W and not L in W:
-			bar.lookLeft()
-			W = bar.wallfrom()
-			while U in W and bar.forward():
-				W = bar.wallfrom()
-				if bar.isopen(U):
-					bar.lookUp()
-					bar.forward()
-					break
-
-		elif L in W and not D in W:
-			bar.lookDown()
-
-		elif D in W and not R in W:
-			bar.lookRight()
-			W = bar.wallfrom()
-			while R in W and bar.forward():
-				W = bar.wallfrom()
-				if bar.isopen(D):
-					bar.lookDown()
-					break
-		elif D in W and R in W and not U in W and not bar.inBadpath(U):
-			W = bar.wallfrom()
-			bar.lookUp()
-			while R in W and bar.forward():
-				W = bar.wallfrom()
-				if bar.isopen(R):
-					bar.lookRight()
-					bar.forward()
-					break
-		elif bar.inBadpath(U):
-			print 'Bad path'
-			bar.lookLeft()
+		if R in W and U in W:
+			bar.lookTo(D)
 			bar.forward()
 
-	if bar.pos() == bar.path[0]:
-		#bar.exit('No solution')
-		print 'Dead end here'
+		elif R in W and D in W:
+			bar.lookTo(U)
+			bar.forward()
+
+		elif L in W and D in W and not R in W:
+			bar.lookTo(R)
+			bar.forward()
+
+		elif L in W and U in W:
+			bar.lookTo(D)
+			bar.forward()
+
+		elif L in W and D in W and not R in W:
+			bar.lookTo(R)
+			bar.forward()
+
+	W = bar.wallfrom()
+	if bar.pos() == [0, bar.entry_at] or \
+		(U in W and D in W and L in W and R in W):
 		bar.entry_at += 1
-		bar.placeai(bar.entry_at)
+		return bar.placeai(bar.entry_at)
 
-	return False
+	return 1
 
-while not step():
+ret = step()
+while ret != 0:
+
+	if ret == -1:
+		print 'No solution!'
+		exit(-1)
 
 	for i in range(bar.gridW + 5): print '-',
 	print
@@ -142,4 +91,4 @@ while not step():
 			print j,
 		print
 
-
+	ret = step()
