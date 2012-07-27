@@ -81,7 +81,7 @@ def step():
 
 initscr();
 
-win = newwin(30,60,0,0);
+win = newwin(300,600,0,0);
 win.nodelay(1);
 n = 0
 
@@ -97,7 +97,7 @@ while 1:
 
 	for i in range(bar.gridH):
 		for j in range(bar.gridW):
-			win.addstr(i+2, j+9, grid[i][j])
+			win.addstr(i+2, j+1, grid[i][j])
 
 	win.refresh()
 

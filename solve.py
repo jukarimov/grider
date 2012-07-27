@@ -76,19 +76,28 @@ def step():
 	return 1
 
 ret = step()
+count = 0
 while ret != 0:
 
 	if ret == -1:
 		print 'No solution!'
 		exit(-1)
 
-	for i in range(bar.gridW + 5): print '-',
-	print
+	ret = step()
 
+	count += 1
+'''
 	buf = bar.show()
 	for i in buf:
 		for j in i:
 			print j,
 		print
+'''
 
-	ret = step()
+print 'Solved in', count, 'steps'
+buf = bar.show()
+for i in buf:
+	for j in i:
+		print j,
+	print
+
